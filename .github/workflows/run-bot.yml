@@ -6,7 +6,8 @@ on:
     - cron: '0 */5 * * *'  
 
 jobs:
-  run-bot:
+  cocky-crab:
+    name: seo_is_my_life
     runs-on: ubuntu-latest
 
     concurrency:
@@ -25,40 +26,27 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install GitHub CLI
-        run: sudo apt-get update && sudo apt-get install -y gh
-
       - name: Install Requirements
         run: |
           pip install -r requirements.txt
-
       - name: Fetch Token
         run: |
           sed -i "s/^token:.*/token: \"${TOKEN}\"/" config.yml
           chmod +x ./engines/stockfish
           chmod +x ./engines/fairy-stockfish_x86-64-bmi2
-
       - name: Run Bot
         run: |
-          echo "Starting bot..."
-          python3 -u user_interface.py "matchmaking" "join real-humans" "tournament lrFVSZ51 real humans" &
-          PID=$!
-          
-          # Auto-exit after 350 minutes (so restart runs without overlap)
-          ( sleep 20700 && echo "Time up. Killing bot..." && kill -SIGTERM $PID ) &
-          
-          wait $PID
-          echo "Bot ended cleanly."
-
-  run-new:
+          python3 -u user_interface.py --upgrade "matchmaking" 
+  pensive-puffer:
+    name: seo_is_my_wife
     runs-on: ubuntu-latest
 
     concurrency:
-      group: bot-restart
+      group: bot-restart-pensive
       cancel-in-progress: false
 
     env:
-      TOKEN: ${{ secrets.TOKEN }}
+      TOKEN: ${{ secrets.TOKEN1 }}
 
     steps:
       - name: Setup Actions
@@ -69,33 +57,14 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install GitHub CLI
-        run: sudo apt-get update && sudo apt-get install -y gh
-
       - name: Install Requirements
         run: |
           pip install -r requirements.txt
-
       - name: Fetch Token
         run: |
-          sed -i "s/^token:.*/token: \"${TOKEN1}\"/" config.yml
+          sed -i "s/^token:.*/token: \"${TOKEN}\"/" config.yml
           chmod +x ./engines/stockfish
           chmod +x ./engines/fairy-stockfish_x86-64-bmi2
-
       - name: Run Bot
         run: |
-          echo "Starting bot..."
-          python3 -u user_interface.py "matchmaking" "join real-humans" "tournament lrFVSZ51 real humans" &
-          PID=$!
-          
-          # Auto-exit after 350 minutes (so restart runs without overlap)
-          ( sleep 20700 && echo "Time up. Killing bot..." && kill -SIGTERM $PID ) &
-          
-          wait $PID
-          echo "Bot ended cleanly."
-
-      - name: Self-Restart (Fire-and-Forget)
-        if: always()
-        run: gh workflow run run-bot.yml
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          python3 -u user_interface.py --upgrade "matchmaking" 
